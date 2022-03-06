@@ -34,6 +34,6 @@ def get_album_tracks(album_id: str, country_code: str = None) -> list[Track]:
 
 
 def _create_album_from_json(json):
-    return Album(json['id'], json['name'], json['type'], json['genres'], json['popularity'], json['release_date'],
-                 json['total_tracks'], [artist['id'] for artist in json['artists']],
-                 [track['id'] for track in json['tracks']['items']])
+    return Album(json['id'], json['name'], json['type'], json.get('genres'), json.get('popularity'),
+                 json['release_date'], json['total_tracks'], [artist['id'] for artist in json['artists']],
+                 [track['id'] for track in json.get('tracks', {}).get('items', [])])

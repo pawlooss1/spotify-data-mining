@@ -1,6 +1,7 @@
-import requests
 import base64
 import os
+
+import requests
 
 
 def get_api_token():
