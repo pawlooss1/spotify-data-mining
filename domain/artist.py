@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Artist:
-    api_id: str
+    id: str
     name: str
     followers: int
-    genres: list
+    genres: list[str]
     popularity: int
