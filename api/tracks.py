@@ -16,7 +16,7 @@ def get_track(track_id: str, country_code: str = None) -> Track:
 def get_tracks(tracks_ids: list[str], country_code: str = None) -> list[Track]:
     json = requests.get(
         url=f'https://api.spotify.com/v1/tracks',
-        params={'ids': ','.join(tracks_ids), 'market': country_code},
+        params={'market': country_code, 'ids': ','.join(tracks_ids)},
         headers={'Authorization': f'Bearer {token}'}
     ).json()
     return [_create_track_from_json(j) for j in json['tracks']]
@@ -46,5 +46,5 @@ def _create_audio_features_from_json(json: dict):
 
 
 def _create_track_from_json(json: dict) -> Track:
-    return Track(json['id'], json['name'], json['popularity'], json['explicit'], json['album']['id'],
+    return Track(json['id'], json['name'], json.get('popularity'), json['explicit'], json.get('album', {}).get('id'),
                  [artist['id'] for artist in json['artists']])
