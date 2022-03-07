@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 requests = "*"
+python-dotenv = "*"
+jupyter = "*"
+pandas = "*"
+plotly = "*"
 
 [dev-packages]
 
