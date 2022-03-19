@@ -1,29 +1,29 @@
 import sqlalchemy.orm
 
-Base = sqlalchemy.orm.declarative_base()
+from db import Base
 
 
-class WeeklyCharts(Base):
+class WeeklyChart(Base):
     __tablename__ = "weekly_charts"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     country_code = sqlalchemy.Column(sqlalchemy.String)
     date = sqlalchemy.Column(sqlalchemy.Date)
-    tracks = sqlalchemy.orm.relationship("ChartTracks")
+    tracks = sqlalchemy.orm.relationship("ChartTrack", lazy="joined")
 
 
-class ChartTracks(Base):
+class ChartTrack(Base):
     __tablename__ = "chart_tracks"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     chart_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("weekly_charts.id"))
     position = sqlalchemy.Column(sqlalchemy.Integer)
     track_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("tracks.track_id"))
-    track = sqlalchemy.orm.relationship("Tracks")
-    streams = sqlalchemy.Column(sqlalchemy.Integer)
+    track = sqlalchemy.orm.relationship("Track", lazy="joined")
+    n_streams = sqlalchemy.Column(sqlalchemy.Integer)
 
 
-class Tracks(Base):
+class Track(Base):
     __tablename__ = "tracks"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
