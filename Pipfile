@@ -9,6 +9,7 @@ python-dotenv = "*"
 jupyter = "*"
 pandas = "*"
 plotly = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 
