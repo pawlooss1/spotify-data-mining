@@ -11,6 +11,9 @@ pandas = "*"
 plotly = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
+seaborn = "*"
+matplotlib = "*"
+scikit-learn = "*"
 
 [dev-packages]
 
