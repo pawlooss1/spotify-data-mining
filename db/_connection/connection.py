@@ -1,13 +1,12 @@
 from __future__ import annotations
-
 from typing import List
-
 import sqlalchemy.orm
 
 from db import Table, Instance
 
 _CONNECTION_TYPES = {
-    'sqlite': "sqlite:///{db_name}"
+    'sqlite': "sqlite:///{address}/db_name",
+    'postgres': "postgresql://{username}:{password}@{address}:{port}/{db_name}"
 }
 
 
@@ -38,6 +37,15 @@ class Connection:
             session.commit()
 
 
-def connection_factory(connector_type: str, db_name: str, username: str = "", password: str = "") -> Connection:
+def connection_factory(connector_type: str,
+                       address: str,
+                       port: str,
+                       db_name: str,
+                       username: str,
+                       password: str) -> Connection:
     conn_str = _CONNECTION_TYPES[connector_type]
-    return Connection(conn_str.format(db_name=db_name, username=username, password=password))
+    return Connection(conn_str.format(address=address,
+                                      port=port,
+                                      db_name=db_name,
+                                      username=username,
+                                      password=password))

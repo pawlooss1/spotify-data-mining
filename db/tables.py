@@ -18,7 +18,7 @@ class ChartTrack(Base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     chart_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("weekly_charts.id"))
     position = sqlalchemy.Column(sqlalchemy.Integer)
-    track_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("tracks.track_id"))
+    track_id = sqlalchemy.Column(sqlalchemy.VARCHAR(22), sqlalchemy.ForeignKey("tracks.track_id"))
     track = sqlalchemy.orm.relationship("Track", lazy="joined")
     n_streams = sqlalchemy.Column(sqlalchemy.Integer)
 
@@ -27,7 +27,7 @@ class Track(Base):
     __tablename__ = "tracks"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    track_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
+    track_id = sqlalchemy.Column(sqlalchemy.VARCHAR(length=22), unique=True)
     title = sqlalchemy.Column(sqlalchemy.String)
     artist = sqlalchemy.Column(sqlalchemy.String)
     danceability = sqlalchemy.Column(sqlalchemy.Float)

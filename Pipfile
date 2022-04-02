@@ -10,6 +10,7 @@ jupyter = "*"
 pandas = "*"
 plotly = "*"
 sqlalchemy = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 

@@ -1,6 +1,8 @@
 import datetime as dt
+import os
 
 import pandas as pd
+from dotenv import load_dotenv
 
 from db import Table, Base
 from db._connection.connection import Connection, connection_factory
@@ -38,9 +40,15 @@ def _insert_chart_tracks(gw: ChartTracksGateway) -> None:
 
 
 def main() -> None:
-    conn_type = "sqlite"
-    db_name = "../data/sqlite.db"
-    conn = connection_factory(conn_type, db_name)
+    load_dotenv()
+    conn_type = os.environ['DB_TYPE']
+    db_addr = os.environ['DB_ADDRESS']
+    db_port = os.environ['DB_PORT']
+    db_name = os.environ['DB_NAME']
+    db_user = os.environ['DB_USERNAME']
+    db_password = os.environ['DB_PASSWORD']
+    conn = connection_factory(conn_type, db_addr, db_port, db_name, db_user, db_password)
+
     tracks_gw = TracksGateway()
     charts_gw = ChartsGateway()
     chart_tracks_gw = ChartTracksGateway()
