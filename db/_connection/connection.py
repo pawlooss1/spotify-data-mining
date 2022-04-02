@@ -5,7 +5,7 @@ import sqlalchemy.orm
 from db import Table, Instance
 
 _CONNECTION_TYPES = {
-    'sqlite': "sqlite:///{address}/db_name",
+    'sqlite': "sqlite:///{address}/{db_name}",
     'postgres': "postgresql://{username}:{password}@{address}:{port}/{db_name}"
 }
 
@@ -17,10 +17,11 @@ class Connection:
     def create_ddl(self, base: Table) -> None:
         base.metadata.create_all(self._engine)
 
-    def insert(self, obj: Instance) -> None:
+    def insert(self, obj: Instance) -> int:
         with sqlalchemy.orm.Session(self._engine) as session:
             session.add(obj)
             session.commit()
+            return obj.id
 
     def insert_all(self, objects: List[Instance]) -> None:
         with sqlalchemy.orm.Session(self._engine) as session:

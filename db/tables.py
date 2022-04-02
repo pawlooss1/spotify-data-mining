@@ -7,7 +7,7 @@ class WeeklyChart(Base):
     __tablename__ = "weekly_charts"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    country_code = sqlalchemy.Column(sqlalchemy.String)
+    country = sqlalchemy.Column(sqlalchemy.String)
     date = sqlalchemy.Column(sqlalchemy.Date)
     tracks = sqlalchemy.orm.relationship("ChartTrack", lazy="joined")
 

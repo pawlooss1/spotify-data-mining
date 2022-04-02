@@ -17,8 +17,8 @@ class IGateway(ABC):
         df = pd.DataFrame(record.__dict__ for record in query)
         return df.drop('_sa_instance_state', axis=1)
 
-    def create(self, obj: Instance) -> None:
-        self._conn.insert(obj)
+    def create(self, obj: Instance) -> int:
+        return self._conn.insert(obj)
 
     def create_all(self, objects: List[Instance]) -> None:
         self._conn.insert_all(objects)
