@@ -1,3 +1,4 @@
+import pandas as pd
 from abc import ABC
 from typing import List
 
@@ -11,8 +12,10 @@ class IGateway(ABC):
         self._conn = _conn
         self._table = table
 
-    def fetch_all(self) -> List[Instance]:
-        return self._conn.select_all(self._table)
+    def fetch_all(self) -> pd.DataFrame:
+        query = self._conn.select_all(self._table)
+        df = pd.DataFrame(record.__dict__ for record in query)
+        return df.drop('_sa_instance_state', axis=1)
 
     def create(self, obj: Instance) -> None:
         self._conn.insert(obj)

@@ -27,9 +27,9 @@ class Connection:
             session.add_all(objects)
             session.commit()
 
-    def select_all(self, table: Table) -> List[Instance]:
+    def select_all(self, table: Table) -> sqlalchemy.orm.Query:
         with sqlalchemy.orm.Session(self._engine) as session:
-            return session.query(table).all()
+            return session.query(table)
 
     def delete(self, obj: Instance) -> None:
         with sqlalchemy.orm.Session(self._engine) as session:
