@@ -4,8 +4,11 @@ import os
 import requests
 from dotenv import load_dotenv
 
+token = None
 
-def get_api_token():
+
+def refresh_api_token():
+    global token
     load_dotenv()
     client_id = os.environ['CLIENT_ID']
     client_secret = os.environ['CLIENT_SECRET']
@@ -18,8 +21,7 @@ def get_api_token():
             'Authorization': authorization
         }
     )
-    return response.json()['access_token']
+    token = response.json()['access_token']
 
 
-token = get_api_token()
-print(token)
+refresh_api_token()
