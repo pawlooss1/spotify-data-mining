@@ -5,7 +5,7 @@ import sqlalchemy.orm
 from db import Table, Instance
 
 _CONNECTION_TYPES = {
-    'sqlite': "sqlite:///{address}/db_name",
+    'sqlite': "sqlite:///{address}/{db_name}",
     'postgres': "postgresql://{username}:{password}@{address}:{port}/{db_name}"
 }
 
