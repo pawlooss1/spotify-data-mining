@@ -1,6 +1,8 @@
+from threading import Thread
+
 import requests
 
-from api import token
+from api import token, async_utils
 from api.albums import _create_album_from_json
 from api.tracks import _create_track_from_json
 from domain.album import Album
@@ -22,6 +24,16 @@ def get_artists(artist_ids: list[str]) -> list[Artist]:
         headers={'Authorization': f'Bearer {token}'}
     ).json()
     return [_create_artist_from_json(j) for j in json['artists']]
+
+
+def get_artists_async(artist_ids: list[str], callback) -> Thread:
+    return async_utils.async_request(
+        'get',
+        url=f'https://api.spotify.com/v1/artists',
+        params={'ids': ','.join(artist_ids)},
+        headers={'Authorization': f'Bearer {token}'},
+        callback=lambda r: callback([_create_artist_from_json(j) for j in r.json()['artists']])
+    )
 
 
 def get_artist_albums(artist_id: str, country_code: str = None) -> list[Album]:

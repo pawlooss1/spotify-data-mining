@@ -31,18 +31,26 @@ def get_track_audio_features(track_id: str) -> AudioFeatures:
 
 
 def get_tracks_audio_features(tracks_ids: list[str]) -> list[AudioFeatures]:
-    json = requests.get(
+    response = requests.get(
         url=f'https://api.spotify.com/v1/audio-features/',
         params={'ids': ','.join(tracks_ids)},
         headers={'Authorization': f'Bearer {token}'}
-    ).json()
-    return [_create_audio_features_from_json(j) for j in json['audio_features']]
+    )
+    if response.status_code != 200:
+        print(response.text)
+        return []
+    json = response.json()
+    return [_create_audio_features_from_json(j) for j in json['audio_features'] if j]
 
 
 def _create_audio_features_from_json(json: dict):
-    return AudioFeatures(json['id'], json['danceability'], json['energy'], json['key'], json['loudness'], json['mode'],
+    try:
+        return AudioFeatures(json['id'], json['danceability'], json['energy'], json['key'], json['loudness'], json['mode'],
                          json['speechiness'], json['acousticness'], json['instrumentalness'], json['liveness'],
                          json['valence'], json['tempo'], json['duration_ms'], json['time_signature'])
+    except Exception as e:
+        print(e)
+        print(json)
 
 
 def _create_track_from_json(json: dict) -> Track:
