@@ -23,13 +23,30 @@ class ChartTrack(Base):
     n_streams = sqlalchemy.Column(sqlalchemy.Integer)
 
 
+class Artist(Base):
+    __tablename__ = "artists"
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    artist_id = sqlalchemy.Column(sqlalchemy.VARCHAR(length=22), unique=True)
+    name = sqlalchemy.Column(sqlalchemy.String)
+    followers = sqlalchemy.Column(sqlalchemy.Integer)
+    genres = sqlalchemy.Column(sqlalchemy.JSON)
+    popularity = sqlalchemy.Column(sqlalchemy.Integer)
+
+
+track_artists = sqlalchemy.Table("track_artists", Base.metadata,
+                                 sqlalchemy.Column("track_id", sqlalchemy.ForeignKey("tracks.track_id")),
+                                 sqlalchemy.Column("artist_id", sqlalchemy.ForeignKey("artists.artist_id")))
+
+
 class Track(Base):
     __tablename__ = "tracks"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     track_id = sqlalchemy.Column(sqlalchemy.VARCHAR(length=22), unique=True)
     title = sqlalchemy.Column(sqlalchemy.String)
-    artist = sqlalchemy.Column(sqlalchemy.String)
+    artists = sqlalchemy.orm.relationship("Artist", secondary=track_artists)
+    genres = sqlalchemy.Column(sqlalchemy.JSON)
     danceability = sqlalchemy.Column(sqlalchemy.Float)
     energy = sqlalchemy.Column(sqlalchemy.Float)
     key = sqlalchemy.Column(sqlalchemy.Float)

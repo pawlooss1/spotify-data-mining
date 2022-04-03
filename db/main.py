@@ -1,7 +1,8 @@
 import datetime as dt
 import glob
+import json
 import os
-from typing import Tuple
+from typing import Tuple, List, Dict
 
 import pandas as pd
 import pycountry
@@ -9,8 +10,8 @@ from dotenv import load_dotenv
 
 from db import Table, Base
 from db._connection.connection import Connection, connection_factory
-from db.gateway.gateway import TracksGateway, ChartsGateway, ChartTracksGateway
-from db.tables import Track, WeeklyChart, ChartTrack
+from db.gateway.gateway import TracksGateway, ChartsGateway, ChartTracksGateway, ArtistsGateway, TrackArtistsGateway
+from db.tables import Track, WeeklyChart, ChartTrack, Artist
 
 
 def _create_tables(conn: Connection, base: Table) -> None:
@@ -18,15 +19,30 @@ def _create_tables(conn: Connection, base: Table) -> None:
     conn.create_ddl(base)
 
 
-def _insert_tracks(gw: TracksGateway) -> None:
+def _insert_tracks(gw_t: TracksGateway, gw_ta: TrackArtistsGateway) -> None:
     # Insert tracks
-    tracks_path = "../data/features_with_empty_artists.csv"
+    tracks_path = "../data/features.csv"
     df = pd.read_csv(tracks_path)
-    tracks = [Track(**track[1].to_dict()) for track in df.iterrows()]
-    gw.create_all(tracks)
+    tracks = [Track(**track[1].to_dict()) for track in df.iloc[:, df.columns != 'artists_ids'].iterrows()]
+    gw_t.create_all(tracks)
+    _insert_track_artists(gw_ta, df[['track_id', 'artists_ids']].values)
 
 
-def _insert_charts_and_tracks(gw_charts: ChartsGateway, gw_tracks) -> None:
+def _insert_artists(gw: ArtistsGateway) -> None:
+    # Insert artists
+    artists_path = "../data/artists.csv"
+    df = pd.read_csv(artists_path)
+    artists = [Artist(**artist[1].to_dict()) for artist in df.iterrows()]
+    gw.create_all(artists)
+
+
+def _insert_track_artists(gw: TrackArtistsGateway, tracks: List[List[str]]) -> None:
+    # Insert track artists
+    track_artists = [{'track_id': t[0], 'artist_id': a} for t in tracks for a in json.loads(t[1])]
+    gw.create_all(track_artists)
+
+
+def _insert_charts_and_tracks(gw_charts: ChartsGateway, gw_tracks: ChartTracksGateway) -> None:
     # Insert charts
     charts_path = "../data/charts"
     for country_path in glob.glob(f"{charts_path}/*"):
@@ -72,13 +88,16 @@ def main() -> None:
     db_password = os.environ['DB_PASSWORD']
     conn = connection_factory(conn_type, db_addr, db_port, db_name, db_user, db_password)
 
+    artists_gw = ArtistsGateway()
     tracks_gw = TracksGateway()
+    track_artists_gw = TrackArtistsGateway()
     charts_gw = ChartsGateway()
     chart_tracks_gw = ChartTracksGateway()
 
     # Init DB
     _create_tables(conn, Base)
-    _insert_tracks(tracks_gw)
+    _insert_artists(artists_gw)
+    _insert_tracks(tracks_gw, track_artists_gw)
     _insert_charts_and_tracks(charts_gw, chart_tracks_gw)
 
     tracks = chart_tracks_gw.fetch_all()

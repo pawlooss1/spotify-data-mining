@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import List
+
+from typing import List, Dict, Any
+
 import sqlalchemy.orm
 
 from db import Table, Instance
@@ -22,6 +24,12 @@ class Connection:
             session.add(obj)
             session.commit()
             return obj.id
+
+    def insert_values(self, table: Table, values: Dict[str, Any]) -> None:
+        self._engine.connect().execute(table.insert(), values)
+
+    def insert_all_values(self, table: Table, values: List[Dict[str, Any]]) -> None:
+        self._engine.connect().execute(table.insert(), values)
 
     def insert_all(self, objects: List[Instance]) -> None:
         with sqlalchemy.orm.Session(self._engine) as session:

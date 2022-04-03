@@ -1,10 +1,11 @@
-import pandas as pd
 from abc import ABC
-from typing import List
+from typing import List, Dict, Any
+
+import pandas as pd
 
 from db import Table, Instance
 from db.gateway import _conn
-from db.tables import WeeklyChart, ChartTrack, Track
+from db.tables import WeeklyChart, ChartTrack, Track, Artist, track_artists
 
 
 class IGateway(ABC):
@@ -37,6 +38,22 @@ class ChartTracksGateway(IGateway):
         super().__init__(ChartTrack)
 
 
+class ArtistsGateway(IGateway):
+    def __init__(self):
+        super().__init__(Artist)
+
+
 class TracksGateway(IGateway):
     def __init__(self):
         super().__init__(Track)
+
+
+class TrackArtistsGateway(IGateway):
+    def __init__(self):
+        super().__init__(track_artists)
+
+    def create(self, values: Dict[str, Any]) -> None:
+        self._conn.insert_values(self._table, values)
+
+    def create_all(self, values: List[Dict[str, Any]]) -> None:
+        self._conn.insert_all_values(self._table, values)
