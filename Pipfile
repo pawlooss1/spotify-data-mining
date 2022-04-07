@@ -17,6 +17,8 @@ scikit-learn = "*"
 ipykernel = "*"
 grequests = "*"
 pycountry = "*"
+pexpect = "*"
+wordcloud = "*"
 
 [dev-packages]
 
