@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from db._connection.connection import connection_factory
+from .._connection.connection import connection_factory
 
 load_dotenv()
 _conn = connection_factory(

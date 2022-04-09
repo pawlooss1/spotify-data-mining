@@ -3,9 +3,9 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
-from db import Table, Instance
-from db.gateway import _conn
-from db.tables import WeeklyChart, ChartTrack, Track, Artist, track_artists
+from src.db import Table, Instance
+from src.db.gateway import _conn
+from src.db.tables import WeeklyChart, ChartTrack, Track, Artist, track_artists
 
 
 class IGateway(ABC):

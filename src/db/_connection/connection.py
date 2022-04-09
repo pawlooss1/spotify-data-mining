@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 
 import sqlalchemy.orm
 
-from db import Table, Instance
+from src.db import Table, Instance
 
 _CONNECTION_TYPES = {
     'sqlite': "sqlite:///{address}/{db_name}",
