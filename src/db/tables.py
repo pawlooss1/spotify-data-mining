@@ -1,6 +1,6 @@
 import sqlalchemy.orm
 
-from src.db import Base
+from db import Base
 
 
 class WeeklyChart(Base):

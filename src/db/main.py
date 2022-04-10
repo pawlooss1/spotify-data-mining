@@ -8,10 +8,10 @@ import pandas as pd
 import pycountry
 from dotenv import load_dotenv
 
-from src.db import Table, Base
-from src.db._connection.connection import Connection, connection_factory
-from src.db.gateway.gateway import TracksGateway, ChartsGateway, ChartTracksGateway, ArtistsGateway, TrackArtistsGateway
-from src.db.tables import Track, WeeklyChart, ChartTrack, Artist
+from db import Table, Base
+from db._connection.connection import Connection, connection_factory
+from db.gateway.gateway import TracksGateway, ChartsGateway, ChartTracksGateway, ArtistsGateway, TrackArtistsGateway
+from db.tables import Track, WeeklyChart, ChartTrack, Artist
 
 
 def _create_tables(conn: Connection, base: Table) -> None:
