@@ -2,8 +2,10 @@ import requests
 
 from api import token
 from domain.track import Track, AudioFeatures
+from utils import retry
 
 
+@retry(times=3, exceptions=requests.exceptions.JSONDecodeError)
 def get_track(track_id: str, country_code: str = None) -> Track:
     json = requests.get(
         url=f'https://api.spotify.com/v1/tracks/{track_id}',
@@ -13,6 +15,7 @@ def get_track(track_id: str, country_code: str = None) -> Track:
     return _create_track_from_json(json)
 
 
+@retry(times=3, exceptions=requests.exceptions.JSONDecodeError)
 def get_tracks(tracks_ids: list[str], country_code: str = None) -> list[Track]:
     json = requests.get(
         url=f'https://api.spotify.com/v1/tracks',
@@ -22,6 +25,7 @@ def get_tracks(tracks_ids: list[str], country_code: str = None) -> list[Track]:
     return [_create_track_from_json(j) for j in json['tracks']]
 
 
+@retry(times=3, exceptions=requests.exceptions.JSONDecodeError)
 def get_track_audio_features(track_id: str) -> AudioFeatures:
     json = requests.get(
         url=f'https://api.spotify.com/v1/audio-features/{track_id}',
@@ -30,6 +34,7 @@ def get_track_audio_features(track_id: str) -> AudioFeatures:
     return _create_audio_features_from_json(json)
 
 
+@retry(times=3, exceptions=requests.exceptions.JSONDecodeError)
 def get_tracks_audio_features(tracks_ids: list[str]) -> list[AudioFeatures]:
     response = requests.get(
         url=f'https://api.spotify.com/v1/audio-features/',
