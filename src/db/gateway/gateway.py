@@ -1,59 +1,62 @@
-from abc import ABC
-from typing import List, Dict, Any
-
 import pandas as pd
+from abc import ABC
 
-from db import Table, Instance
+from db import Table
 from db.gateway import _conn
-from db.tables import WeeklyChart, ChartTrack, Track, Artist, track_artists
+from db.tables import Country, WeeklyChart, ChartTrack, Track, Artist, track_artists
 
 
-class IGateway(ABC):
+class IPandasGateway(ABC):
     def __init__(self, table: Table):
         self._conn = _conn
         self._table = table
 
     def fetch_all(self) -> pd.DataFrame:
         query = self._conn.select_all(self._table)
-        df = pd.DataFrame(record.__dict__ for record in query)
-        return df.drop('_sa_instance_state', axis=1)
+        df = pd.read_sql(query.statement, query.session.bind)
+        return df.set_index('id')
 
-    def create(self, obj: Instance) -> int:
+    def create(self, row: pd.Series) -> int:
+        obj = self._table(**row.to_dict())
         return self._conn.insert(obj)
 
-    def create_all(self, objects: List[Instance]) -> None:
+    def create_all(self, df: pd.DataFrame) -> None:
+        objects = [self._table(**row.to_dict()) for _, row in df.iterrows()]
         self._conn.insert_all(objects)
 
-    def delete(self, obj: Instance) -> None:
-        self._conn.delete(obj)
+
+class CountriesGateway(IPandasGateway):
+    def __init__(self):
+        super().__init__(Country)
 
 
-class ChartsGateway(IGateway):
+class ChartsGateway(IPandasGateway):
     def __init__(self):
         super().__init__(WeeklyChart)
 
 
-class ChartTracksGateway(IGateway):
+class ChartTracksGateway(IPandasGateway):
     def __init__(self):
         super().__init__(ChartTrack)
 
 
-class ArtistsGateway(IGateway):
+class ArtistsGateway(IPandasGateway):
     def __init__(self):
         super().__init__(Artist)
 
 
-class TracksGateway(IGateway):
+class TracksGateway(IPandasGateway):
     def __init__(self):
         super().__init__(Track)
 
 
-class TrackArtistsGateway(IGateway):
+class TrackArtistsGateway(IPandasGateway):
     def __init__(self):
         super().__init__(track_artists)
 
-    def create(self, values: Dict[str, Any]) -> None:
-        self._conn.insert_values(self._table, values)
+    def create(self, row: pd.Series) -> None:
+        self._conn.insert_values(self._table, row.to_dict())
 
-    def create_all(self, values: List[Dict[str, Any]]) -> None:
-        self._conn.insert_all_values(self._table, values)
+    def create_all(self, df: pd.DataFrame) -> None:
+        objects = [row.to_dict() for _, row in df.iterrows()]
+        self._conn.insert_all_values(self._table, objects)
