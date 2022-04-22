@@ -4,7 +4,7 @@ from typing import Callable, Dict, Iterator, List
 
 import utils
 from api import artists, tracks
-from db.gateway.gateway import ArtistsGateway, ChartTracksGateway, ChartsGateway, CountriesGateway, TrackArtistsGateway, TracksGateway
+from db.gateway import ArtistsGateway, ChartTracksGateway, ChartsGateway, CountriesGateway, TrackArtistsGateway, TracksGateway
 
 
 countries_gw = CountriesGateway()
