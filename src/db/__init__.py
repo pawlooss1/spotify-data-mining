@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+from sqlalchemy.dialects.postgresql import insert
 import sqlalchemy.orm
 from dotenv import load_dotenv
-from typing import Type, List, Dict, Any
+from typing import Type, List, Dict, Any, Union
 
 
 Base = sqlalchemy.orm.declarative_base()
@@ -23,22 +24,10 @@ class Connection:
     def create_ddl(self, base: Table) -> None:
         base.metadata.create_all(self._engine)
 
-    def insert(self, obj: Instance) -> int:
-        with sqlalchemy.orm.Session(self._engine) as session:
-            session.add(obj)
-            session.commit()
-            return obj.id
-
-    def insert_values(self, table: Table, values: Dict[str, Any]) -> None:
-        self._engine.connect().execute(table.insert(), values)
-
-    def insert_all_values(self, table: Table, values: List[Dict[str, Any]]) -> None:
-        self._engine.connect().execute(table.insert(), values)
-
-    def insert_all(self, objects: List[Instance]) -> None:
-        with sqlalchemy.orm.Session(self._engine) as session:
-            session.add_all(objects)
-            session.commit()
+    def upsert(self, table: Table, values: Union[Dict[str, Any], List[Dict[str, Any]]]) -> None:
+        self._engine.connect().execute(
+            insert(table).on_conflict_do_nothing(index_elements=['id']),
+            values)
 
     def select_all(self, table: Table) -> sqlalchemy.orm.Query:
         with sqlalchemy.orm.Session(self._engine) as session:

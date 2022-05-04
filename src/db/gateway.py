@@ -16,12 +16,11 @@ class IPandasGateway(ABC):
         return df.set_index('id')
 
     def create(self, row: pd.Series) -> int:
-        obj = self._table(**row.to_dict())
-        return self._conn.insert(obj)
+        return self._conn.upsert(self._table, row.to_dict())
 
     def create_all(self, df: pd.DataFrame) -> None:
-        objects = [self._table(**row.to_dict()) for _, row in df.iterrows()]
-        self._conn.insert_all(objects)
+        objects = [row.to_dict() for _, row in df.iterrows()]
+        self._conn.upsert(self._table, objects)
 
 
 class CountriesGateway(IPandasGateway):
@@ -52,10 +51,3 @@ class TracksGateway(IPandasGateway):
 class TrackArtistsGateway(IPandasGateway):
     def __init__(self):
         super().__init__(track_artists)
-
-    def create(self, row: pd.Series) -> None:
-        self._conn.insert_values(self._table, row.to_dict())
-
-    def create_all(self, df: pd.DataFrame) -> None:
-        objects = [row.to_dict() for _, row in df.iterrows()]
-        self._conn.insert_all_values(self._table, objects)

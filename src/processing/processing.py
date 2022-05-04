@@ -22,7 +22,7 @@ def fetch_tracks(track_ids: List) -> pd.DataFrame:
     df = fetch(track_ids,
                chunk_size=50,
                fetch_fun=tracks.get_tracks)
-    df.rename(columns={'name': 'title'})
+    df.rename(columns={'name': 'title'}, inplace=True)
     return df
 
 
@@ -65,20 +65,23 @@ def create_countries(countries: pd.DataFrame) -> None:
     countries_gw.create_all(countries)
 
 
-def create_tracks_and_artists(tracks: pd.DataFrame,
-                              features: pd.DataFrame,
-                              artists: pd.DataFrame) -> None:
-    tracks_gw.create_all(tracks[['id', 'title']].merge(features,
-                                                       how='inner',
-                                                       on='id'))
-    artists_gw.create_all(artists)
-    artists_ids = pd.DataFrame([[t_id, a_id]
-                                for t_id, a_ids in tracks[['id', 'artists_ids']].values
-                                for a_id in a_ids], columns=['track_id', 'artist_id'])
-    track_artists_gw.create_all(artists_ids)
+def create_tracks_and_artists(df_tracks: pd.DataFrame) -> None:
+    df_features = fetch_features(df_tracks['id'].values)
+    tracks_gw.create_all(df_tracks[['id', 'title']].merge(df_features,
+                                                          how='inner',
+                                                          on='id'))
+    artists_ids = set(itertools.chain.from_iterable(df_tracks['artists_ids'].values))
+    df_artists = fetch_artists(artists_ids)
+    artists_gw.create_all(df_artists)
+    track_artists_ids = pd.DataFrame([[t_id, a_id]
+                                     for t_id, a_ids in df_tracks[['id', 'artists_ids']].values
+                                     for a_id in a_ids], columns=['track_id', 'artist_id'])
+    track_artists_gw.create_all(track_artists_ids)
 
 
 def create_chart(chart_info: pd.Series, chart: pd.DataFrame) -> None:
+    df_tracks = fetch_tracks(chart['track_id'].values)
+    create_tracks_and_artists(df_tracks)
     chart_id = charts_gw.create(chart_info)
     chart['chart_id'] = chart_id
     chart.drop(['title', 'artist'], axis=1, inplace=True)
