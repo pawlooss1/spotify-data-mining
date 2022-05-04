@@ -19,6 +19,7 @@ grequests = "*"
 pycountry = "*"
 pexpect = "*"
 wordcloud = "*"
+cloudscraper = "*"
 
 [dev-packages]
 autopep8 = "*"

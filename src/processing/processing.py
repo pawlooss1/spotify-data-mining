@@ -1,9 +1,12 @@
 import itertools
 import pandas as pd
+import pycountry
 from typing import Callable, Dict, Iterator, List
 
 import utils
+import scraper
 from api import artists, tracks
+from db import _conn, Base
 from db.gateway import ArtistsGateway, ChartTracksGateway, ChartsGateway, CountriesGateway, TrackArtistsGateway, TracksGateway
 
 
@@ -48,6 +51,15 @@ def _fetch_chunks(lst: List, chunk_size: int, fn: Callable[[List], Dict]) -> Ite
         print(f"chunk {i}/{n}")
         yield fn(chunk)
 
+def create_db() -> None:
+    _conn.create_ddl(Base)
+    # Create all countries
+    ids = scraper.scrape_countries()
+    ids[ids.index("global")] = "gl"
+    names = ["Global" if code == "gl" else pycountry.countries.get(alpha_2=code).name
+             for code in ids]
+    create_countries(pd.DataFrame(list(zip(ids, names)), columns=['id', 'name']))
+
 
 def create_countries(countries: pd.DataFrame) -> None:
     countries_gw.create_all(countries)
@@ -69,4 +81,5 @@ def create_tracks_and_artists(tracks: pd.DataFrame,
 def create_chart(chart_info: pd.Series, chart: pd.DataFrame) -> None:
     chart_id = charts_gw.create(chart_info)
     chart['chart_id'] = chart_id
+    chart.drop(['title', 'artist'], axis=1, inplace=True)
     chart_tracks_gw.create_all(chart)
