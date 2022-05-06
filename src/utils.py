@@ -1,10 +1,13 @@
 import itertools
+import logging
 import time
 from typing import Callable, Generator, Iterable, Type, TypeVar
 
 
 R = TypeVar('R')
 T = TypeVar('T')
+
+logger = logging.getLogger("utils")
 
 
 def retry(times: int, exceptions: Type[Exception]) -> Callable:
@@ -27,7 +30,7 @@ def retry(times: int, exceptions: Type[Exception]) -> Callable:
                 try:
                     return func(*args, **kwargs)
                 except exceptions:
-                    print(f"Exception thrown when attempting to run {func.__name__}, attempt {attempt} of {times}")
+                    logger.debug(f"Exception thrown when attempting to run {func.__name__}, attempt {attempt} of {times}")
                     attempt += 1
                     time.sleep(3)
             return func(*args, **kwargs)
