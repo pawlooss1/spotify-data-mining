@@ -20,6 +20,7 @@ pycountry = "*"
 pexpect = "*"
 wordcloud = "*"
 cloudscraper = "*"
+flask = "*"
 
 [dev-packages]
 autopep8 = "*"
