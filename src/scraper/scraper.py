@@ -1,3 +1,4 @@
+import logging.config
 from typing import Dict, List
 import cloudscraper
 import pandas as pd
@@ -5,10 +6,16 @@ import datetime
 import time
 import os
 from bs4 import BeautifulSoup
+import requests
+
+from utils import retry
 
 
 START_DATE = datetime.date(2016, 12, 23)
 END_DATE = datetime.date(2022, 2, 25)
+
+logging.config.fileConfig(fname="logging.conf")
+logger = logging.getLogger("scraper")
 
 
 def dates_gen():
@@ -61,6 +68,7 @@ def scrape_charts_for_all_countries(date_range: str) -> Dict[str, pd.DataFrame]:
     return charts
 
 
+@retry(times=3, exceptions=requests.exceptions.ConnectionError)
 def scrape_countries() -> List[str]:
     scraper = cloudscraper.create_scraper() # returns a CloudScraper instance
 
@@ -70,7 +78,10 @@ def scrape_countries() -> List[str]:
     return [li['data-value'] for li in codes_html.find_all('li')]
 
 
+@retry(times=3, exceptions=requests.exceptions.ConnectionError)
 def scrape_chart(date_range: str, country_code: str) -> pd.DataFrame:
+    logger.info(f"Scraping {country_code!r} {date_range!r}")
+
     scraper = cloudscraper.create_scraper() # returns a CloudScraper instance
     req = scraper.get(f'https://spotifycharts.com/regional/{country_code}/weekly/{date_range}')
     if not req.ok:

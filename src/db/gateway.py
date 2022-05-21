@@ -2,7 +2,7 @@ import pandas as pd
 from abc import ABC
 
 from db import _conn, Table
-from db.tables import Country, WeeklyChart, ChartTrack, Track, Artist, track_artists
+from db.tables import Country, TrackArtist, WeeklyChart, ChartTrack, Track, Artist
 
 
 class IPandasGateway(ABC):
@@ -50,4 +50,15 @@ class TracksGateway(IPandasGateway):
 
 class TrackArtistsGateway(IPandasGateway):
     def __init__(self):
-        super().__init__(track_artists)
+        super().__init__(TrackArtist)
+
+    def create(self, row: pd.Series) -> int:
+        return self._conn.upsert(self._table,
+                                 row.to_dict(),
+                                 columns=['track_id', 'artist_id'])
+
+    def create_all(self, df: pd.DataFrame) -> None:
+        objects = [row.to_dict() for _, row in df.iterrows()]
+        self._conn.upsert(self._table,
+                          objects,
+                          columns=['track_id', 'artist_id'])

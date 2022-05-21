@@ -1,18 +1,22 @@
 import base64
 import os
-
 import requests
 from dotenv import load_dotenv
 
+from utils import retry
+
+
+NETWORK_EXCEPTIONS = (requests.exceptions.JSONDecodeError, requests.exceptions.ConnectionError)
 token = None
 
+CLIENT_ID = os.environ['CLIENT_ID']
+CLIENT_SECRET = os.environ['CLIENT_SECRET']
 
+@retry(times=3, exceptions=NETWORK_EXCEPTIONS)
 def refresh_api_token():
     global token
     load_dotenv()
-    client_id = os.environ['CLIENT_ID']
-    client_secret = os.environ['CLIENT_SECRET']
-    authorization = f"Basic {base64.b64encode(bytes(f'{client_id}:{client_secret}', 'utf-8')).decode('utf-8')}"
+    authorization = f"Basic {base64.b64encode(bytes(f'{CLIENT_ID}:{CLIENT_SECRET}', 'utf-8')).decode('utf-8')}"
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={'grant_type': 'client_credentials'},

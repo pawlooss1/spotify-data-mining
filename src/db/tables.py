@@ -1,4 +1,5 @@
 import sqlalchemy.orm
+import sqlalchemy.schema
 
 from db import Base
 
@@ -44,11 +45,15 @@ class Artist(Base):
     popularity = sqlalchemy.Column(sqlalchemy.Integer)
 
 
-track_artists = sqlalchemy.Table("track_artists",
-                                 Base.metadata,
-                                 sqlalchemy.Column(
-                                     "track_id", sqlalchemy.ForeignKey("tracks.id")),
-                                 sqlalchemy.Column("artist_id", sqlalchemy.ForeignKey("artists.id")))
+class TrackArtist(Base):
+    __tablename__ = "track_artists"
+    __table_args__ = (
+        sqlalchemy.schema.UniqueConstraint("track_id", "artist_id", name="unique_track_artist"),
+    )
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    track_id = sqlalchemy.Column(sqlalchemy.ForeignKey("tracks.id"))
+    artist_id = sqlalchemy.Column(sqlalchemy.ForeignKey("artists.id"))
 
 
 class Track(Base):

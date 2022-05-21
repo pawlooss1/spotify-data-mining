@@ -4,7 +4,7 @@ import os
 from sqlalchemy.dialects.postgresql import insert
 import sqlalchemy.orm
 from dotenv import load_dotenv
-from typing import Type, List, Dict, Any, Union
+from typing import Optional, Tuple, Type, List, Dict, Any, Union
 
 
 Base = sqlalchemy.orm.declarative_base()
@@ -24,10 +24,18 @@ class Connection:
     def create_ddl(self, base: Table) -> None:
         base.metadata.create_all(self._engine)
 
-    def upsert(self, table: Table, values: Union[Dict[str, Any], List[Dict[str, Any]]]) -> None:
-        self._engine.connect().execute(
-            insert(table).on_conflict_do_nothing(index_elements=['id']),
-            values)
+    def upsert(self,
+               table: Table,
+               values: Union[Dict[str, Any], List[Dict[str, Any]]],
+               *,
+               columns: Optional[List[str]] = None) -> List[Tuple]:
+        columns = ["id"] if columns is None else columns
+        ret_val = [getattr(table, attr) for attr in columns]
+        with self._engine.connect() as connection:
+            return connection.execute(insert(table).\
+                                          on_conflict_do_nothing(index_elements=columns).\
+                                          returning(*ret_val),
+                                      values).all()
 
     def select_all(self, table: Table) -> sqlalchemy.orm.Query:
         with sqlalchemy.orm.Session(self._engine) as session:
