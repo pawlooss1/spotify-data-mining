@@ -1,8 +1,12 @@
 from flask import Flask, request, redirect
 
 from api import CLIENT_ID
+from api.artists import get_artists
 from api.auth import get_access_token
+from api.tracks import get_tracks_audio_features, get_tracks
 from api.users import get_user_top_tracks
+from domain.track import Track
+from recommendation.engine import create_recommendations
 
 app = Flask(__name__)
 
@@ -23,7 +27,11 @@ def get_recommendations():
         return redirect(AUTHORIZE_REDIRECT)
     token = get_access_token(params['code'], REDIRECT_URI)
     user_tracks = get_user_top_tracks(token)
-    return format_response(user_tracks)
+    user_tracks_ids = [track['id'] for track in user_tracks]
+    user_tracks_features = get_tracks_audio_features(user_tracks_ids)
+    recommendations_ids = create_recommendations(user_tracks_features)
+    recommendations_tracks = get_tracks(recommendations_ids)
+    return format_response(recommendations_tracks)
 
 
 def format_response(user_tracks: list):
@@ -31,8 +39,9 @@ def format_response(user_tracks: list):
     return {'tracks': formatted_tracks}
 
 
-def format_track(track) -> str:
-    return f"{track['artists'][0]['name']} - {track['name']}"
+def format_track(track: Track) -> str:
+    artist_names = [a.name for a in get_artists(track.artists_ids)]
+    return f"{', '.join(artist_names)} - {track.name} {track.id}"
 
 
 if __name__ == '__main__':
