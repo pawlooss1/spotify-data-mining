@@ -1,11 +1,18 @@
-FROM python:3.9-slim-bullseye
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+FROM python:3.9-slim-buster
 
-RUN apt-get update -y
-RUN apt-get install git -y
+RUN pip install pipenv
 
-COPY . .
-RUN pip3 install -r requirements.txt
+ENV PROJECT_DIR=/usr/local/src/webapp
+ENV FLASK_APP=src/service/app.py
 
-ENTRYPOINT []
+WORKDIR ${PROJECT_DIR}
+
+COPY Pipfile Pipfile.lock ${PROJECT_DIR}/
+
+COPY . ${PROJECT_DIR}/
+
+RUN pipenv install --system --deploy
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

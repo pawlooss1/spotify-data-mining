@@ -21,6 +21,7 @@ pexpect = "*"
 wordcloud = "*"
 cloudscraper = "*"
 flask = "*"
+spotify-data-mining = {editable = true, path = "."}
 
 [dev-packages]
 autopep8 = "*"
