@@ -1,0 +1,12 @@
+docker-compose.yml
+README.md
+build
+airflow
+data
+notebooks
+Dockerfile
+.dockerignore
+.gitignore
+.git
+.github
+.vscode
