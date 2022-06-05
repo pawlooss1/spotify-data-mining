@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 import requests
 from dotenv import load_dotenv
@@ -6,7 +7,7 @@ from dotenv import load_dotenv
 from utils import retry
 
 
-NETWORK_EXCEPTIONS = (requests.exceptions.JSONDecodeError, requests.exceptions.ConnectionError)
+NETWORK_EXCEPTIONS = (KeyError, json.decoder.JSONDecodeError, requests.exceptions.JSONDecodeError, requests.exceptions.ConnectionError)
 token = None
 
 CLIENT_ID = os.environ['CLIENT_ID']
