@@ -5,7 +5,7 @@ FROM python:3.9-slim-buster
 RUN pip install pipenv
 
 ENV PROJECT_DIR=/usr/local/src/webapp
-ENV FLASK_APP=src/service/app.py
+ENV FLASK_APP=service/app.py
 
 WORKDIR ${PROJECT_DIR}
 
