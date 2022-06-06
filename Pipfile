@@ -22,6 +22,7 @@ wordcloud = "*"
 cloudscraper = "*"
 flask = "*"
 spotify-data-mining = {editable = true, path = "."}
+voila = "*"
 
 [dev-packages]
 autopep8 = "*"
