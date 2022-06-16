@@ -3,7 +3,6 @@ README.md
 build
 airflow
 data
-notebooks
 Dockerfile
 .dockerignore
 .gitignore
