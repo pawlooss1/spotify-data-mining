@@ -91,6 +91,24 @@ def create_chart(chart_info: pd.Series, chart: pd.DataFrame) -> None:
     chart_tracks_gw.create_all(chart)
 
 
+def get_all_tracks():
+    df_tracks = tracks_gw.fetch_all()
+    df_track_artists = track_artists_gw.fetch_all()
+    df_artists = artists_gw.fetch_all()
+    df_track_ids_genres = df_track_artists \
+        .merge(df_artists, how='left', left_on='artist_id', right_on='id') \
+        .groupby('track_id')['genres'] \
+        .apply(_merge_genres)
+    return df_tracks.merge(df_track_ids_genres,
+                           how='left',
+                           left_on='id',
+                           right_on='track_id')
+
+
+def _merge_genres(s: pd.Series) -> list:
+    return list(set(itertools.chain.from_iterable(s.values)))
+
+
 if __name__ == "__main__":
     from scraper import scrape_chart
     ch = scrape_chart("2022-04-22--2022-04-29", "sv")

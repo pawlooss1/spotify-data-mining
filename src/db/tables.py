@@ -62,7 +62,6 @@ class Track(Base):
     id = sqlalchemy.Column(sqlalchemy.VARCHAR(length=22), primary_key=True)
     title = sqlalchemy.Column(sqlalchemy.String)
     # artists = sqlalchemy.orm.relationship("Artist", secondary=track_artists)
-    genres = sqlalchemy.Column(sqlalchemy.JSON)
     danceability = sqlalchemy.Column(sqlalchemy.Float)
     energy = sqlalchemy.Column(sqlalchemy.Float)
     key = sqlalchemy.Column(sqlalchemy.Float)
