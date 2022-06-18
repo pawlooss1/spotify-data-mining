@@ -23,6 +23,7 @@ cloudscraper = "*"
 flask = "*"
 spotify-data-mining = {editable = true, path = "."}
 voila = "*"
+geopandas = "*"
 
 [dev-packages]
 autopep8 = "*"
