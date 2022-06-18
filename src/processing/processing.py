@@ -1,5 +1,6 @@
 import itertools
-import logging
+import logging.config
+import os
 import pandas as pd
 import pycountry
 from typing import Callable, Dict, Iterator, List
@@ -11,6 +12,7 @@ from db import _conn, Base
 from db.gateway import ArtistsGateway, ChartTracksGateway, ChartsGateway, CountriesGateway, TrackArtistsGateway, TracksGateway
 
 
+logging.config.fileConfig(fname=os.environ['LOG_CONF'])
 logger = logging.getLogger("processing")
 
 countries_gw = CountriesGateway()

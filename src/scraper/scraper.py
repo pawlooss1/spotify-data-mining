@@ -14,7 +14,7 @@ from utils import retry
 START_DATE = datetime.date(2016, 12, 23)
 END_DATE = datetime.date(2022, 2, 25)
 
-logging.config.fileConfig(fname="logging.conf")
+logging.config.fileConfig(fname=os.environ['LOG_CONF'])
 logger = logging.getLogger("scraper")
 
 
