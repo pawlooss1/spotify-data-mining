@@ -3,7 +3,7 @@ import logging.config
 import os
 import pandas as pd
 import pycountry
-from typing import Callable, Dict, Iterator, List
+from typing import Callable, Dict, Iterator, List, Optional, Tuple
 
 import utils
 import scraper
@@ -91,7 +91,7 @@ def create_chart(chart_info: pd.Series, chart: pd.DataFrame) -> None:
     chart_tracks_gw.create_all(chart)
 
 
-def get_all_tracks():
+def get_tracks_with_genres() -> pd.DataFrame:
     df_tracks = tracks_gw.fetch_all()
     df_track_artists = track_artists_gw.fetch_all()
     df_artists = artists_gw.fetch_all()
@@ -109,8 +109,12 @@ def _merge_genres(s: pd.Series) -> list:
     return list(set(itertools.chain.from_iterable(s.values)))
 
 
-if __name__ == "__main__":
-    from scraper import scrape_chart
-    ch = scrape_chart("2022-04-22--2022-04-29", "sv")
-    tr = fetch_tracks(ch['track_id'])
-    create_tracks_and_artists(tr)
+def get_charts(country_code: Optional[str] = None,
+               date_range: Optional[Tuple[str, str]] = None) -> pd.DataFrame:
+    df_charts = charts_gw.fetch_all()
+    if country_code is None:
+        df_country_charts = df_charts
+    else:
+        df_country_charts = df_charts[df_charts['country_code'] == country_code]
+    df_chart_tracks = chart_tracks_gw.fetch_all()
+    return df_country_charts.merge(df_chart_tracks, left_index=True, right_on='chart_id')
