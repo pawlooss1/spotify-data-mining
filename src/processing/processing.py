@@ -95,14 +95,14 @@ def get_all_tracks():
     df_tracks = tracks_gw.fetch_all()
     df_track_artists = track_artists_gw.fetch_all()
     df_artists = artists_gw.fetch_all()
-    df_track_ids_genres = df_track_artists \
+    s_genres = df_track_artists \
         .merge(df_artists, how='left', left_on='artist_id', right_on='id') \
         .groupby('track_id')['genres'] \
         .apply(_merge_genres)
-    return df_tracks.merge(df_track_ids_genres,
+    return df_tracks.merge(s_genres,
                            how='left',
                            left_on='id',
-                           right_on='track_id')
+                           right_index=True)
 
 
 def _merge_genres(s: pd.Series) -> list:
