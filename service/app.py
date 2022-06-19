@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_from_directory
 
 from api import CLIENT_ID
 from api.artists import get_artists
@@ -57,5 +57,10 @@ def format_track(track: Track) -> str:
     return f"{', '.join(artist_names)} - {track.name} {track.id}"
 
 
+@app.route('/notebooks/<path:path>')
+def send_report(path):
+    return send_from_directory('../data/outputs', path)
+
+
 if __name__ == '__main__':
-    app.run(host="localhost", port=8080)
+    app.run(host="0.0.0.0", port=8080)
