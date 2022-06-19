@@ -56,4 +56,4 @@ def _create_audio_features_from_json(json: dict):
 
 def _create_track_from_json(json: dict) -> Track:
     return Track(json['id'], json['name'], json.get('popularity'), json['explicit'], json.get('album', {}).get('id'),
-                 [artist['id'] for artist in json['artists']])
+                 [artist['id'] for artist in json['artists']], json['external_urls'].get('spotify'))

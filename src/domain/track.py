@@ -9,6 +9,7 @@ class Track:
     explicit: bool
     album_id: str
     artists_ids: list[str]
+    url: str
 
 
 @dataclass
