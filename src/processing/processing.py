@@ -112,9 +112,17 @@ def _merge_genres(s: pd.Series) -> list:
 def get_charts(country_code: Optional[str] = None,
                date_range: Optional[Tuple[str, str]] = None) -> pd.DataFrame:
     df_charts = charts_gw.fetch_all()
+    # Extract country
     if country_code is None:
         df_country_charts = df_charts
     else:
         df_country_charts = df_charts[df_charts['country_code'] == country_code]
+    # Extract date range
+    if date_range is not None:
+        df_country_charts['date'] = pd.to_datetime(df_country_charts['date'])
+        s_date_mask = (df_country_charts['date'] > date_range[0]) & \
+                      (df_country_charts['date'] <= date_range[1])
+        df_country_charts = df_country_charts.loc[s_date_mask]
+
     df_chart_tracks = chart_tracks_gw.fetch_all()
     return df_country_charts.merge(df_chart_tracks, left_index=True, right_on='chart_id')
