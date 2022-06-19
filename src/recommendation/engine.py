@@ -20,7 +20,7 @@ CAT_COLUMN_NAMES = ['key_0', 'key_1', 'key_2', 'key_3', 'key_4', 'key_5', 'key_6
 scaler = MinMaxScaler()
 
 tracks_gw = TracksGateway()
-features = tracks_gw.fetch_all()
+features = tracks_gw.fetch_all().dropna()
 
 
 def append_popularity(features: pd.DataFrame):
