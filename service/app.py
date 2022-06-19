@@ -7,12 +7,15 @@ from api.tracks import get_tracks_audio_features, get_tracks
 from api.users import get_user_top_tracks
 from domain.track import Track
 from recommendation.engine import create_recommendations
+import uuid
 
 app = Flask(__name__)
 
 REDIRECT_URI = 'http://localhost:8080/recommendations'
-AUTHORIZE_REDIRECT = f'https://accounts.spotify.com/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri=' \
-                     f'http://localhost:8080/recommendations&scope=user-top-read'
+states = {}
+def authorize_redirect(state):
+    return f'https://accounts.spotify.com/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri=' \
+                     f'http://localhost:8080/recommendations&state={state}&scope=user-top-read'
 
 
 @app.route('/')
@@ -24,19 +27,23 @@ def hello_world():
 def get_recommendations():
     params = request.args
     if 'code' not in params:
-        return redirect(AUTHORIZE_REDIRECT)
+        time_range = params.get('time_range', 'medium_term')
+        popularity_rate = float(params.get('popularity_rate', '0'))
+        state = str(uuid.uuid4())
+        states[state] = time_range, popularity_rate
+        return redirect(authorize_redirect(state))
+    time_range, popularity_rate = states[params['state']]
     token = get_access_token(params['code'], REDIRECT_URI)
-    user_tracks = get_user_top_tracks(token)
+    user_tracks = get_user_top_tracks(token, time_range)
     user_tracks_ids = [track['id'] for track in user_tracks]
     user_tracks_features = get_tracks_audio_features(user_tracks_ids)
-    recommendations_ids = create_recommendations(user_tracks_features)
+    recommendations_ids = create_recommendations(user_tracks_features, popularity_rate)
     recommendations_tracks = get_tracks(recommendations_ids)
     return format_response(recommendations_tracks)
 
 
 def format_response(user_tracks: list):
-    formatted_tracks = [format_track(track) for track in user_tracks]
-    return {'tracks': formatted_tracks}
+    return {'tracks': user_tracks}
 
 
 def format_track(track: Track) -> str:
