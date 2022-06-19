@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from flask import Flask, request, redirect
 
 from api import CLIENT_ID
@@ -7,15 +10,18 @@ from api.tracks import get_tracks_audio_features, get_tracks
 from api.users import get_user_top_tracks
 from domain.track import Track
 from recommendation.engine import create_recommendations
-import uuid
 
 app = Flask(__name__)
 
-REDIRECT_URI = 'http://localhost:8080/recommendations'
+SERVER_HOST = os.environ['SERVER_HOST']
+
+REDIRECT_URI = f'http://{SERVER_HOST}:8080/recommendations'
 states = {}
+
+
 def authorize_redirect(state):
-    return f'https://accounts.spotify.com/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri=' \
-                     f'http://localhost:8080/recommendations&state={state}&scope=user-top-read'
+    return f'https://accounts.spotify.com/authorize?client_id={CLIENT_ID}&response_type=code&' \
+           f'redirect_uri={REDIRECT_URI}&state={state}&scope=user-top-read'
 
 
 @app.route('/')
