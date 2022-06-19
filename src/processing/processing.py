@@ -1,3 +1,4 @@
+import ast
 import itertools
 import logging.config
 import os
@@ -106,6 +107,8 @@ def get_tracks_with_genres() -> pd.DataFrame:
 
 
 def _merge_genres(s: pd.Series) -> list:
+    if type(s.iloc[0]) == str:
+        s = s.apply(ast.literal_eval)
     return list(set(itertools.chain.from_iterable(s.values)))
 
 
